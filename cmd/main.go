@@ -35,8 +35,7 @@ func main() {
 		log.Fatalf("Failed to create the client: %v", err)
 	}
 
-	clientRepository := persistence.NewClientRepository(client)
-	_, err = clientRepository.GetOrCreateDB("favourite")
+	err = persistence.InitDB(client, "favourite")
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
