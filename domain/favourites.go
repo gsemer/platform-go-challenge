@@ -7,3 +7,9 @@ type Favourite struct {
 	To        string    `json:"_to"`   // Reference to the asset document
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type FavouriteService interface {
+}
+
+type FavouriteRepository interface {
+}
