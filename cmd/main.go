@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"platform-go-challenge/persistence"
 	"time"
 
 	"github.com/arangodb/go-driver"
@@ -72,4 +73,8 @@ func main() {
 			log.Printf("Collection %s was created successfully", collectionName)
 		}
 	}
+
+	userRepo := persistence.NewUserRepository(db)
+
+	_, _ = userRepo.CreateUsers()
 }
