@@ -29,6 +29,12 @@ services:
       - arangodb
     networks:
       - platform-network
+    environment:
+      - ARANGO_URL=http://arangodb:8529
+      - ARANGO_USERNAME=root
+      - ARANGO_PASSWORD=rootpassword
+      - ARANGO_DB=favourite
+      - SERVE_ON_PORT=8000
 
 volumes:
   arangodb_data_container:

@@ -3,11 +3,19 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
 )
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
 
 func main() {
 	log.Println("Server is up and running...")
@@ -17,7 +25,7 @@ func main() {
 
 	connection, err := http.NewConnection(
 		http.ConnectionConfig{
-			Endpoints: []string{"http://arangodb:8529"},
+			Endpoints: []string{getEnv("ARANGO_URL", "")},
 		},
 	)
 	if err != nil {
@@ -26,15 +34,18 @@ func main() {
 
 	client, err := driver.NewClient(
 		driver.ClientConfig{
-			Connection:     connection,
-			Authentication: driver.BasicAuthentication("root", "rootpassword"),
+			Connection: connection,
+			Authentication: driver.BasicAuthentication(
+				getEnv("ARANGO_USERNAME", "root"),
+				getEnv("ARANGO_PASSWORD", ""),
+			),
 		},
 	)
 	if err != nil {
 		log.Fatalf("Failed to create the client: %v", err)
 	}
 
-	_, err = client.Database(context.Background(), "platform-db")
+	_, err = client.Database(context.Background(), getEnv("ARANGO_DB", ""))
 	if err != nil {
 		if driver.IsNotFoundGeneral(err) {
 			_, err = client.CreateDatabase(context.Background(), "platform-db", nil)
