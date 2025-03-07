@@ -3,12 +3,15 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
 	"platform-go-challenge/persistence"
+	"platform-go-challenge/presentation"
 	"time"
 
 	"github.com/arangodb/go-driver"
 	arangohttp "github.com/arangodb/go-driver/http"
+	"github.com/gorilla/mux"
 )
 
 func getEnv(key, fallback string) string {
@@ -28,6 +31,7 @@ func main() {
 	arangoUsername := getEnv("ARANGO_USERNAME", "root")
 	arangoPassword := getEnv("ARANGO_PASSWORD", "")
 	arangoDB := getEnv("ARANGO_DB", "")
+	serverOnPort := getEnv("SERVE_ON_PORT", "8000")
 
 	connection, err := arangohttp.NewConnection(
 		arangohttp.ConnectionConfig{
@@ -79,4 +83,15 @@ func main() {
 
 	_, _ = userRepo.CreateUsers()
 	_, _ = assetRepo.CreateAssets()
+
+	r := mux.NewRouter()
+
+	favouriteRoutes := presentation.CreateRoutes()
+	for routePath, routeDefinition := range favouriteRoutes {
+		log.Printf("adding %s route with methods %v\n", routePath, routeDefinition.Methods)
+		r.Handle(routePath, routeDefinition.HandlerFunc).Methods(routeDefinition.Methods...)
+	}
+
+	http.Handle("/", r)
+	log.Fatal(http.ListenAndServe(":"+serverOnPort, r))
 }
