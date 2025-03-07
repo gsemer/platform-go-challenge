@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"log"
+	"platform-go-challenge/consts"
 	"platform-go-challenge/domain"
-	"time"
 
 	"github.com/arangodb/go-driver"
 )
@@ -32,29 +32,7 @@ func (ur UserRepository) CreateUsers() ([]domain.User, error) {
 		return []domain.User{}, errors.New("there are already documents in user collections")
 	}
 
-	users := []domain.User{
-		domain.User{
-			FirstName: "William",
-			LastName:  "Smith",
-			Username:  "wsmith",
-			Email:     "wsmith@outlook.com",
-			CreatedAt: time.Now(),
-		},
-		domain.User{
-			FirstName: "John",
-			LastName:  "Doe",
-			Username:  "jdoe",
-			Email:     "jdoe@outlook.com",
-			CreatedAt: time.Now(),
-		},
-		domain.User{
-			FirstName: "Alice",
-			LastName:  "Johnson",
-			Username:  "ajohnson",
-			Email:     "ajohnson@outlook.com",
-			CreatedAt: time.Now(),
-		},
-	}
+	users := consts.Users
 
 	arangoUsers := []domain.User{}
 	for _, user := range users {
