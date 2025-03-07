@@ -1,15 +1,15 @@
 version: '3.7'
 
 networks:
-  favourites-network:
+  platform-network:
     external: true
 
 services:
-  arangodb_go_container:
+  arangodb:
     image: arangodb:latest
-    container_name: arangodb_go_container
+    container_name: arangodb
     environment:
-      ARANGO_URL: http://arangodb_go_container:8529/_db/favourite/_api/database/current
+      ARANGO_ROOT_USERNAME: root    
       ARANGO_ROOT_PASSWORD: rootpassword
     ports:
       - 8529:8529
@@ -17,18 +17,18 @@ services:
       - arangodb_data_container:/var/lib/arangodb3
       - arangodb_apps_data_container:/var/lib/arangodb3-apps
     networks:
-      - favourites-network
+      - platform-network
 
-  favourite_assets_container:
+  platform_service:
     build: .
-    image: favourite_assets
-    container_name: favourite_assets_container 
+    image: platform_image
+    container_name: platform_container
     ports: 
       - 8000:8000
     depends_on:
-      - arangodb_go_container
+      - arangodb
     networks:
-      - favourites-network
+      - platform-network
 
 volumes:
   arangodb_data_container:
