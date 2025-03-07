@@ -1,9 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
-	"platform-go-challenge/persistence"
 	"time"
 
 	"github.com/arangodb/go-driver"
@@ -11,14 +10,14 @@ import (
 )
 
 func main() {
-	for i := 0; i < 5; i++ {
-		fmt.Println("Server is up and running...")
-		time.Sleep(2 * time.Second)
-	}
+	log.Println("Server is up and running...")
+
+	log.Println("Waiting 10 seconds for the ArangoDB container to be ready...")
+	time.Sleep(10 * time.Second)
 
 	connection, err := http.NewConnection(
 		http.ConnectionConfig{
-			Endpoints: []string{"http://arangodb_go_container:8529"},
+			Endpoints: []string{"http://arangodb:8529"},
 		},
 	)
 	if err != nil {
@@ -35,8 +34,14 @@ func main() {
 		log.Fatalf("Failed to create the client: %v", err)
 	}
 
-	err = persistence.InitDB(client, "favourite")
+	_, err = client.Database(context.Background(), "platform-db")
 	if err != nil {
-		log.Fatalf("%v", err)
+		if driver.IsNotFoundGeneral(err) {
+			_, err = client.CreateDatabase(context.Background(), "platform-db", nil)
+			if err != nil {
+				log.Fatalf("Failed to create database: %v", err)
+			}
+		}
+		log.Println("Database 'platform-db' was created successfully")
 	}
 }
