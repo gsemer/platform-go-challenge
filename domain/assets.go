@@ -39,3 +39,7 @@ type Audience struct {
 	SocialMediaHours   int    `json:"social_media_hours"`
 	PurchasesLastMonth int    `json:"purchases_last_month"`
 }
+
+type AssetRepository interface {
+	CreateAssets() ([]Asset, error)
+}
