@@ -75,6 +75,8 @@ func main() {
 	}
 
 	userRepo := persistence.NewUserRepository(db)
+	assetRepo := persistence.NewAssetRepository(db)
 
 	_, _ = userRepo.CreateUsers()
+	_, _ = assetRepo.CreateAssets()
 }
