@@ -64,23 +64,14 @@ func main() {
 		log.Println("Database 'platform-db' was created successfully")
 	}
 
-	collectionNames := []string{"user", "asset", "favourite"}
-	for _, collectionName := range collectionNames {
-		_, err := db.Collection(context.Background(), collectionName)
-		if err != nil {
-			if driver.IsNotFoundGeneral(err) {
-				_, err = db.CreateCollection(context.Background(), collectionName, nil)
-				if err != nil {
-					log.Fatalf("Failed to create collection: %v", err)
-				}
-			}
-			log.Printf("Collection %s was created successfully", collectionName)
-		}
-	}
+	collectionRepository := persistence.NewCollectionRepository(db)
 
-	userRepo := persistence.NewUserRepository(db)
-	assetRepo := persistence.NewAssetRepository(db)
+	userCollection := collectionRepository.GetOrCreate("user")
+	assetCollection := collectionRepository.GetOrCreate("asset")
+	_ = collectionRepository.GetOrCreate("favourite")
 
+	userRepo := persistence.NewUserRepository(userCollection)
+	assetRepo := persistence.NewAssetRepository(assetCollection)
 	_, _ = userRepo.CreateUsers()
 	_, _ = assetRepo.CreateAssets()
 
