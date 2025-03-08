@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"platform-go-challenge/app/services"
 	"platform-go-challenge/persistence"
 	"platform-go-challenge/presentation"
 	"time"
@@ -66,9 +67,9 @@ func main() {
 
 	collectionRepository := persistence.NewCollectionRepository(db)
 
-	userCollection := collectionRepository.GetOrCreate("user")
-	assetCollection := collectionRepository.GetOrCreate("asset")
-	_ = collectionRepository.GetOrCreate("favourite")
+	userCollection := collectionRepository.GetOrCreate("user", "document")
+	assetCollection := collectionRepository.GetOrCreate("asset", "document")
+	favouriteCollection := collectionRepository.GetOrCreate("favourite", "edge")
 
 	userRepo := persistence.NewUserRepository(userCollection)
 	assetRepo := persistence.NewAssetRepository(assetCollection)
@@ -77,7 +78,13 @@ func main() {
 
 	r := mux.NewRouter()
 
-	favouriteRoutes := presentation.CreateRoutes()
+	favouriteRepo := persistence.NewFavouriteRepository(db, map[string]driver.Collection{
+		"asset":     assetCollection,
+		"user":      userCollection,
+		"favourite": favouriteCollection})
+	favouriteService := services.NewFavouriteService(favouriteRepo)
+
+	favouriteRoutes := presentation.CreateRoutes(favouriteService)
 	for routePath, routeDefinition := range favouriteRoutes {
 		log.Printf("adding %s route with methods %v\n", routePath, routeDefinition.Methods)
 		r.Handle(routePath, routeDefinition.HandlerFunc).Methods(routeDefinition.Methods...)
