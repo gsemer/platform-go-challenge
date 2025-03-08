@@ -11,20 +11,15 @@ import (
 )
 
 type UserRepository struct {
-	db driver.Database
+	collection driver.Collection
 }
 
-func NewUserRepository(db driver.Database) *UserRepository {
-	return &UserRepository{db: db}
+func NewUserRepository(collection driver.Collection) *UserRepository {
+	return &UserRepository{collection: collection}
 }
 
 func (ur UserRepository) CreateUsers() ([]domain.User, error) {
-	userCollection, err := ur.db.Collection(context.Background(), "user")
-	if err != nil {
-		log.Println("Couldn't get the collection when trying to create users")
-	}
-
-	numOfDocs, err := userCollection.Count(context.Background())
+	numOfDocs, err := ur.collection.Count(context.Background())
 	if err != nil {
 		log.Println("Failed to get document count for user collection")
 	}
@@ -36,7 +31,7 @@ func (ur UserRepository) CreateUsers() ([]domain.User, error) {
 
 	arangoUsers := []domain.User{}
 	for _, user := range users {
-		meta, err := userCollection.CreateDocument(context.Background(), &user)
+		meta, err := ur.collection.CreateDocument(context.Background(), &user)
 		if err != nil {
 			log.Printf("Couldn't create new document")
 			return []domain.User{}, err

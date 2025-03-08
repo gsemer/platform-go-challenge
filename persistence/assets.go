@@ -11,20 +11,15 @@ import (
 )
 
 type AssetRepository struct {
-	db driver.Database
+	collection driver.Collection
 }
 
-func NewAssetRepository(db driver.Database) *AssetRepository {
-	return &AssetRepository{db: db}
+func NewAssetRepository(collection driver.Collection) *AssetRepository {
+	return &AssetRepository{collection: collection}
 }
 
 func (ar AssetRepository) CreateAssets() ([]domain.Asset, error) {
-	assetCollection, err := ar.db.Collection(context.Background(), "asset")
-	if err != nil {
-		log.Println("Couldn't get the collection when trying to create assets")
-	}
-
-	numOfDocs, err := assetCollection.Count(context.Background())
+	numOfDocs, err := ar.collection.Count(context.Background())
 	if err != nil {
 		log.Println("Failed to get document count for asset collection")
 	}
@@ -36,7 +31,7 @@ func (ar AssetRepository) CreateAssets() ([]domain.Asset, error) {
 
 	arangoAssets := []domain.Asset{}
 	for _, asset := range assets {
-		meta, err := assetCollection.CreateDocument(context.Background(), &asset)
+		meta, err := ar.collection.CreateDocument(context.Background(), &asset)
 		if err != nil {
 			log.Printf("Couldn't create new document")
 			return []domain.Asset{}, err
