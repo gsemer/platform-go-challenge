@@ -9,6 +9,7 @@ RUN go mod download
 COPY . ./
 
 RUN go build -o /platform-go-challenge ./cmd/main.go
+RUN go test ./...
 
 EXPOSE 8000
 
