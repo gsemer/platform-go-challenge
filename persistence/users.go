@@ -41,3 +41,11 @@ func (ur UserRepository) CreateUsers() ([]domain.User, error) {
 	}
 	return arangoUsers, nil
 }
+
+func (ur UserRepository) GetUser(userID string) (string, error) {
+	user, err := ur.collection.ReadDocument(context.Background(), userID, nil)
+	if err != nil {
+		return "", err
+	}
+	return string(user.ID), nil
+}

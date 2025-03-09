@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	Key       string    `json:"_key,omitempty"`
@@ -13,4 +15,5 @@ type User struct {
 
 type UserRepository interface {
 	CreateUsers() ([]User, error)
+	GetUser(userID string) (string, error)
 }
