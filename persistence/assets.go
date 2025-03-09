@@ -41,3 +41,11 @@ func (ar AssetRepository) CreateAssets() ([]domain.Asset, error) {
 	}
 	return arangoAssets, nil
 }
+
+func (ar AssetRepository) GetAsset(assetID string) (string, error) {
+	asset, err := ar.collection.ReadDocument(context.Background(), assetID, nil)
+	if err != nil {
+		return "", err
+	}
+	return string(asset.ID), nil
+}

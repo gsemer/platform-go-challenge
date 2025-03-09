@@ -42,4 +42,5 @@ type Audience struct {
 
 type AssetRepository interface {
 	CreateAssets() ([]Asset, error)
+	GetAsset(assetID string) (string, error)
 }
