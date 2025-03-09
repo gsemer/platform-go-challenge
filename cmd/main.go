@@ -82,7 +82,7 @@ func main() {
 		"asset":     assetCollection,
 		"user":      userCollection,
 		"favourite": favouriteCollection})
-	favouriteService := services.NewFavouriteService(favouriteRepo)
+	favouriteService := services.NewFavouriteService(favouriteRepo, userRepo, assetRepo)
 
 	favouriteRoutes := presentation.CreateRoutes(favouriteService)
 	for routePath, routeDefinition := range favouriteRoutes {
