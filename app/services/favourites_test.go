@@ -10,15 +10,19 @@ import (
 
 func TestAddToFavourites(t *testing.T) {
 	fr := &fakes.FakeFavouriteRepository{}
+	ur := &fakes.FakeUserRepository{}
+	ar := &fakes.FakeAssetRepository{}
 
 	favourite := domain.Favourite{
 		From:      "user/1",
 		To:        "asset/2",
 		CreatedAt: time.Now(),
 	}
+	ur.GetUserReturns("user/1", nil)
+	ar.GetAssetReturns("asset/2", nil)
 	fr.AddToFavouritesReturns(favourite, nil)
 
-	favouriteService := FavouriteService{fr: fr}
+	favouriteService := FavouriteService{fr: fr, ur: ur, ar: ar}
 
 	actual, err := favouriteService.AddToFavourites("1", "2")
 	if err != nil {
@@ -36,11 +40,14 @@ func TestAddToFavourites(t *testing.T) {
 
 func TestAddToFavourites_FAIL(t *testing.T) {
 	fr := &fakes.FakeFavouriteRepository{}
+	ur := &fakes.FakeUserRepository{}
+	ar := &fakes.FakeAssetRepository{}
 
 	favourite := domain.Favourite{}
+	ur.GetUserReturns("", errors.New("document not found"))
 	fr.AddToFavouritesReturns(favourite, errors.New("document not found"))
 
-	favouriteService := FavouriteService{fr: fr}
+	favouriteService := FavouriteService{fr: fr, ur: ur, ar: ar}
 
 	_, err := favouriteService.AddToFavourites("1", "2")
 
