@@ -19,22 +19,12 @@ func NewFavouriteRepository(db driver.Database, collection map[string]driver.Col
 }
 
 func (fr FavouriteRepository) AddToFavourites(userID, assetID string) (domain.Favourite, error) {
-	user, err := fr.collection["user"].ReadDocument(context.Background(), userID, nil)
-	if err != nil {
-		return domain.Favourite{}, err
-	}
-
-	asset, err := fr.collection["asset"].ReadDocument(context.Background(), assetID, nil)
-	if err != nil {
-		return domain.Favourite{}, err
-	}
-
 	favourite := domain.Favourite{
-		From:      string(user.ID),
-		To:        string(asset.ID),
+		From:      userID,
+		To:        assetID,
 		CreatedAt: time.Now(),
 	}
-	_, err = fr.collection["favourite"].CreateDocument(context.Background(), &favourite)
+	_, err := fr.collection["favourite"].CreateDocument(context.Background(), &favourite)
 	if err != nil {
 		log.Println("Couldn't create new document to favourites")
 		return domain.Favourite{}, err
