@@ -21,6 +21,20 @@ type FakeFavouriteRepository struct {
 		result1 domain.Favourite
 		result2 error
 	}
+	DeleteFavouriteStub        func(string, string) (domain.Favourite, error)
+	deleteFavouriteMutex       sync.RWMutex
+	deleteFavouriteArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	deleteFavouriteReturns struct {
+		result1 domain.Favourite
+		result2 error
+	}
+	deleteFavouriteReturnsOnCall map[int]struct {
+		result1 domain.Favourite
+		result2 error
+	}
 	EditFavouritesStub        func(string, string, string) (domain.Asset, error)
 	editFavouritesMutex       sync.RWMutex
 	editFavouritesArgsForCall []struct {
@@ -113,6 +127,71 @@ func (fake *FakeFavouriteRepository) AddToFavouritesReturnsOnCall(i int, result1
 		})
 	}
 	fake.addToFavouritesReturnsOnCall[i] = struct {
+		result1 domain.Favourite
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeFavouriteRepository) DeleteFavourite(arg1 string, arg2 string) (domain.Favourite, error) {
+	fake.deleteFavouriteMutex.Lock()
+	ret, specificReturn := fake.deleteFavouriteReturnsOnCall[len(fake.deleteFavouriteArgsForCall)]
+	fake.deleteFavouriteArgsForCall = append(fake.deleteFavouriteArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.DeleteFavouriteStub
+	fakeReturns := fake.deleteFavouriteReturns
+	fake.recordInvocation("DeleteFavourite", []interface{}{arg1, arg2})
+	fake.deleteFavouriteMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeFavouriteRepository) DeleteFavouriteCallCount() int {
+	fake.deleteFavouriteMutex.RLock()
+	defer fake.deleteFavouriteMutex.RUnlock()
+	return len(fake.deleteFavouriteArgsForCall)
+}
+
+func (fake *FakeFavouriteRepository) DeleteFavouriteCalls(stub func(string, string) (domain.Favourite, error)) {
+	fake.deleteFavouriteMutex.Lock()
+	defer fake.deleteFavouriteMutex.Unlock()
+	fake.DeleteFavouriteStub = stub
+}
+
+func (fake *FakeFavouriteRepository) DeleteFavouriteArgsForCall(i int) (string, string) {
+	fake.deleteFavouriteMutex.RLock()
+	defer fake.deleteFavouriteMutex.RUnlock()
+	argsForCall := fake.deleteFavouriteArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeFavouriteRepository) DeleteFavouriteReturns(result1 domain.Favourite, result2 error) {
+	fake.deleteFavouriteMutex.Lock()
+	defer fake.deleteFavouriteMutex.Unlock()
+	fake.DeleteFavouriteStub = nil
+	fake.deleteFavouriteReturns = struct {
+		result1 domain.Favourite
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeFavouriteRepository) DeleteFavouriteReturnsOnCall(i int, result1 domain.Favourite, result2 error) {
+	fake.deleteFavouriteMutex.Lock()
+	defer fake.deleteFavouriteMutex.Unlock()
+	fake.DeleteFavouriteStub = nil
+	if fake.deleteFavouriteReturnsOnCall == nil {
+		fake.deleteFavouriteReturnsOnCall = make(map[int]struct {
+			result1 domain.Favourite
+			result2 error
+		})
+	}
+	fake.deleteFavouriteReturnsOnCall[i] = struct {
 		result1 domain.Favourite
 		result2 error
 	}{result1, result2}
@@ -253,6 +332,8 @@ func (fake *FakeFavouriteRepository) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.addToFavouritesMutex.RLock()
 	defer fake.addToFavouritesMutex.RUnlock()
+	fake.deleteFavouriteMutex.RLock()
+	defer fake.deleteFavouriteMutex.RUnlock()
 	fake.editFavouritesMutex.RLock()
 	defer fake.editFavouritesMutex.RUnlock()
 	fake.getFavouritesMutex.RLock()
