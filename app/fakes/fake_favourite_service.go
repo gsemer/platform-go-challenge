@@ -21,6 +21,21 @@ type FakeFavouriteService struct {
 		result1 domain.Favourite
 		result2 error
 	}
+	EditFavouritesStub        func(string, string, string) (domain.Asset, error)
+	editFavouritesMutex       sync.RWMutex
+	editFavouritesArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	editFavouritesReturns struct {
+		result1 domain.Asset
+		result2 error
+	}
+	editFavouritesReturnsOnCall map[int]struct {
+		result1 domain.Asset
+		result2 error
+	}
 	GetFavouritesStub        func(string) ([]domain.Asset, error)
 	getFavouritesMutex       sync.RWMutex
 	getFavouritesArgsForCall []struct {
@@ -103,6 +118,72 @@ func (fake *FakeFavouriteService) AddToFavouritesReturnsOnCall(i int, result1 do
 	}{result1, result2}
 }
 
+func (fake *FakeFavouriteService) EditFavourites(arg1 string, arg2 string, arg3 string) (domain.Asset, error) {
+	fake.editFavouritesMutex.Lock()
+	ret, specificReturn := fake.editFavouritesReturnsOnCall[len(fake.editFavouritesArgsForCall)]
+	fake.editFavouritesArgsForCall = append(fake.editFavouritesArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	stub := fake.EditFavouritesStub
+	fakeReturns := fake.editFavouritesReturns
+	fake.recordInvocation("EditFavourites", []interface{}{arg1, arg2, arg3})
+	fake.editFavouritesMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeFavouriteService) EditFavouritesCallCount() int {
+	fake.editFavouritesMutex.RLock()
+	defer fake.editFavouritesMutex.RUnlock()
+	return len(fake.editFavouritesArgsForCall)
+}
+
+func (fake *FakeFavouriteService) EditFavouritesCalls(stub func(string, string, string) (domain.Asset, error)) {
+	fake.editFavouritesMutex.Lock()
+	defer fake.editFavouritesMutex.Unlock()
+	fake.EditFavouritesStub = stub
+}
+
+func (fake *FakeFavouriteService) EditFavouritesArgsForCall(i int) (string, string, string) {
+	fake.editFavouritesMutex.RLock()
+	defer fake.editFavouritesMutex.RUnlock()
+	argsForCall := fake.editFavouritesArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeFavouriteService) EditFavouritesReturns(result1 domain.Asset, result2 error) {
+	fake.editFavouritesMutex.Lock()
+	defer fake.editFavouritesMutex.Unlock()
+	fake.EditFavouritesStub = nil
+	fake.editFavouritesReturns = struct {
+		result1 domain.Asset
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeFavouriteService) EditFavouritesReturnsOnCall(i int, result1 domain.Asset, result2 error) {
+	fake.editFavouritesMutex.Lock()
+	defer fake.editFavouritesMutex.Unlock()
+	fake.EditFavouritesStub = nil
+	if fake.editFavouritesReturnsOnCall == nil {
+		fake.editFavouritesReturnsOnCall = make(map[int]struct {
+			result1 domain.Asset
+			result2 error
+		})
+	}
+	fake.editFavouritesReturnsOnCall[i] = struct {
+		result1 domain.Asset
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeFavouriteService) GetFavourites(arg1 string) ([]domain.Asset, error) {
 	fake.getFavouritesMutex.Lock()
 	ret, specificReturn := fake.getFavouritesReturnsOnCall[len(fake.getFavouritesArgsForCall)]
@@ -172,6 +253,8 @@ func (fake *FakeFavouriteService) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.addToFavouritesMutex.RLock()
 	defer fake.addToFavouritesMutex.RUnlock()
+	fake.editFavouritesMutex.RLock()
+	defer fake.editFavouritesMutex.RUnlock()
 	fake.getFavouritesMutex.RLock()
 	defer fake.getFavouritesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
