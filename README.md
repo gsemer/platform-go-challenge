@@ -50,4 +50,7 @@ An ArangoDB database with elements is created automatically when the service is 
          --header 'user_id: {user_id}' 
          --data '{"description": "The updated description"}'
 
-
+    curl --request DELETE 
+         --url http://localhost:8000/assets/{asset_id}/delete 
+         --header 'Content-Type: application/json' 
+         --header 'user_id: {user_id}'
