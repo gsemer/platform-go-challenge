@@ -12,10 +12,12 @@ type FavouriteService interface {
 	AddToFavourites(userID, assetID string) (Favourite, error)
 	GetFavourites(userID string) ([]Asset, error)
 	EditFavourites(userID, assetID, description string) (Asset, error)
+	DeleteFavourite(userID, assetID string) (Favourite, error)
 }
 
 type FavouriteRepository interface {
 	AddToFavourites(userID, assetID string) (Favourite, error)
 	GetFavourites(userID string) ([]Asset, error)
 	EditFavourites(userID, assetID, description string) (Asset, error)
+	DeleteFavourite(userID, assetID string) (Favourite, error)
 }

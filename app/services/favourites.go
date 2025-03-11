@@ -62,3 +62,21 @@ func (fs FavouriteService) EditFavourites(userID, assetID, description string) (
 	}
 	return asset, nil
 }
+
+func (fs FavouriteService) DeleteFavourite(userID, assetID string) (domain.Favourite, error) {
+	userArangoID, err := fs.ur.GetUser(userID)
+	if err != nil {
+		return domain.Favourite{}, err
+	}
+
+	assetArangoID, err := fs.ar.GetAsset(assetID)
+	if err != nil {
+		return domain.Favourite{}, err
+	}
+
+	favourite, err := fs.fr.DeleteFavourite(userArangoID, assetArangoID)
+	if err != nil {
+		return domain.Favourite{}, err
+	}
+	return favourite, nil
+}

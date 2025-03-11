@@ -103,3 +103,32 @@ func (fr FavouriteRepository) EditFavourites(userID, assetID, description string
 	}
 	return asset, nil
 }
+
+func (fr FavouriteRepository) DeleteFavourite(userID, assetID string) (domain.Favourite, error) {
+	query := `FOR f IN favourite
+	          FILTER f._from==@userID AND f._to==@assetID
+			  RETURN f`
+	bindVars := map[string]interface{}{
+		"userID":  userID,
+		"assetID": assetID,
+	}
+	cursor, err := fr.db.Query(context.Background(), query, bindVars)
+	if err != nil {
+		log.Printf("Failed to execute query")
+		return domain.Favourite{}, err
+	}
+
+	var favourite domain.Favourite
+	meta, err := cursor.ReadDocument(context.Background(), &favourite)
+	if err != nil {
+		log.Printf("Failed to read document")
+		return domain.Favourite{}, err
+	}
+
+	_, err = fr.collection["favourite"].RemoveDocument(context.Background(), meta.Key)
+	if err != nil {
+		log.Println("Couldn't delete document from favourites")
+		return domain.Favourite{}, err
+	}
+	return favourite, nil
+}
