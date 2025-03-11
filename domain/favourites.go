@@ -10,8 +10,10 @@ type Favourite struct {
 
 type FavouriteService interface {
 	AddToFavourites(userID, assetID string) (Favourite, error)
+	GetFavourites(userID string) ([]Asset, error)
 }
 
 type FavouriteRepository interface {
 	AddToFavourites(userID, assetID string) (Favourite, error)
+	GetFavourites(userID string) ([]Asset, error)
 }
