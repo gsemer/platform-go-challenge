@@ -2,6 +2,7 @@ package presentation
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"platform-go-challenge/domain"
 
@@ -55,5 +56,48 @@ func (fh FavouriteHandler) GetFavourites(writer http.ResponseWriter, request *ht
 
 	writer.WriteHeader(http.StatusOK)
 	result, _ := json.Marshal(assets)
+	writer.Write(result)
+}
+
+func (fh FavouriteHandler) EditFavourites(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+
+	assetID, ok := vars["asset_id"]
+	if !ok {
+		writer.WriteHeader(http.StatusBadRequest)
+		result, _ := json.Marshal("Asset ID is missing")
+		writer.Write(result)
+		return
+	}
+
+	userID := request.Header.Get("user_id")
+
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		writer.WriteHeader(500)
+		result, _ := json.Marshal(err)
+		writer.Write(result)
+		return
+	}
+
+	var data map[string]interface{}
+	err = json.Unmarshal([]byte(body), &data)
+	if err != nil {
+		writer.WriteHeader(500)
+		result, _ := json.Marshal(err)
+		writer.Write(result)
+		return
+	}
+
+	asset, err := fh.fs.EditFavourites(userID, assetID, data["description"].(string))
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		result, _ := json.Marshal(err)
+		writer.Write(result)
+		return
+	}
+
+	writer.WriteHeader(http.StatusOK)
+	result, _ := json.Marshal(asset)
 	writer.Write(result)
 }

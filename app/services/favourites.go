@@ -44,3 +44,21 @@ func (fs FavouriteService) GetFavourites(userID string) ([]domain.Asset, error) 
 	}
 	return assets, nil
 }
+
+func (fs FavouriteService) EditFavourites(userID, assetID, description string) (domain.Asset, error) {
+	userArangoID, err := fs.ur.GetUser(userID)
+	if err != nil {
+		return domain.Asset{}, err
+	}
+
+	assetArangoID, err := fs.ar.GetAsset(assetID)
+	if err != nil {
+		return domain.Asset{}, err
+	}
+
+	asset, err := fs.fr.EditFavourites(userArangoID, assetArangoID, description)
+	if err != nil {
+		return domain.Asset{}, err
+	}
+	return asset, nil
+}

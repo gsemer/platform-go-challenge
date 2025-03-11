@@ -71,3 +71,35 @@ func (fr FavouriteRepository) GetFavourites(userID string) ([]domain.Asset, erro
 	}
 	return assets, nil
 }
+
+func (fr FavouriteRepository) EditFavourites(userID, assetID, description string) (domain.Asset, error) {
+	query := `FOR f IN favourite
+	          FILTER f._from==@userID AND f._to==@assetID
+			  LET asset=DOCUMENT(f._to)
+              RETURN asset`
+	bindVars := map[string]interface{}{
+		"userID":  userID,
+		"assetID": assetID,
+	}
+	cursor, err := fr.db.Query(context.Background(), query, bindVars)
+	if err != nil {
+		log.Printf("Failed to execute query")
+		return domain.Asset{}, err
+	}
+
+	var asset domain.Asset
+	meta, err := cursor.ReadDocument(context.Background(), &asset)
+	if err != nil {
+		log.Printf("Failed to read document")
+		return domain.Asset{}, err
+	}
+
+	asset.Description = description
+
+	_, err = fr.collection["asset"].UpdateDocument(context.Background(), meta.Key, &asset)
+	if err != nil {
+		log.Println("Couldn't update document")
+		return domain.Asset{}, err
+	}
+	return asset, nil
+}

@@ -14,5 +14,9 @@ func CreateRoutes(fs domain.FavouriteService) map[string]domain.RouteDefinition 
 			Methods:     []string{"GET"},
 			HandlerFunc: fh.GetFavourites,
 		},
+		"/assets/{asset_id}/edit": {
+			Methods:     []string{"PUT"},
+			HandlerFunc: fh.EditFavourites,
+		},
 	}
 }
