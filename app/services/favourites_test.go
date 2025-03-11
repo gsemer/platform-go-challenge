@@ -2,8 +2,10 @@ package services
 
 import (
 	"errors"
+	"platform-go-challenge/consts"
 	"platform-go-challenge/domain"
 	"platform-go-challenge/persistence/fakes"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -53,5 +55,30 @@ func TestAddToFavourites_FAIL(t *testing.T) {
 
 	if err.Error() != "document not found" {
 		t.Errorf("Expected document not found error, got %v instead", err)
+	}
+}
+
+func TestGetFavourites(t *testing.T) {
+	fr := &fakes.FakeFavouriteRepository{}
+	ur := &fakes.FakeUserRepository{}
+	ar := &fakes.FakeAssetRepository{}
+
+	user := consts.Users[0]
+	favouriteAssets := consts.Charts
+
+	ur.GetUserReturns("user/"+user.Key, nil)
+	fr.GetFavouritesReturns(favouriteAssets, nil)
+
+	favouriteService := FavouriteService{fr: fr, ur: ur, ar: ar}
+
+	actualAssets, err := favouriteService.GetFavourites("user" + user.Key)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if !reflect.DeepEqual(actualAssets, favouriteAssets) {
+		t.Errorf("It was expected to have %v as output,\n but we got %v instead", favouriteAssets, actualAssets)
+		return
 	}
 }

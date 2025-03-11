@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"platform-go-challenge/app/fakes"
+	"platform-go-challenge/consts"
 	"platform-go-challenge/domain"
 	"reflect"
 	"testing"
@@ -83,5 +84,47 @@ func TestAddToFavourites_FAIL(t *testing.T) {
 
 	if response.Code != http.StatusBadRequest {
 		t.Errorf("Expected %v but got %v", http.StatusBadRequest, response.Code)
+	}
+}
+
+func TestGetFavourites(t *testing.T) {
+	// On this test, there is the assumption that the user's favourites are only chart data.
+	fs := &fakes.FakeFavouriteService{}
+
+	favouriteAssets := consts.Charts
+	fs.GetFavouritesReturns(favouriteAssets, nil)
+
+	myHandler := FavouriteHandler{fs: fs}
+
+	request := httptest.NewRequest("GET", "/assets/starred", nil)
+	response := httptest.NewRecorder()
+
+	router := mux.NewRouter()
+	router.HandleFunc("/assets/starred", myHandler.GetFavourites)
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Errorf("Status code is not %v, but is %v", http.StatusOK, response.Code)
+		return
+	}
+
+	favouriteList, err := io.ReadAll(response.Body)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	var result []domain.Asset
+	err = json.Unmarshal([]byte(favouriteList), &result)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	for i, _ := range result {
+		if !reflect.DeepEqual(result[i].Data.ChartData, favouriteAssets[i].Data.ChartData) {
+			t.Errorf("It was expected to have %v as output, but got %v instead", favouriteAssets[i].Data.ChartData, result[i].Data.ChartData)
+			return
+		}
 	}
 }
