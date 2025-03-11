@@ -31,3 +31,43 @@ func (fr FavouriteRepository) AddToFavourites(userID, assetID string) (domain.Fa
 	}
 	return favourite, nil
 }
+
+func (fr FavouriteRepository) GetFavourites(userID string) ([]domain.Asset, error) {
+	bindVars := map[string]interface{}{
+		"userID": userID,
+	}
+
+	query := `FOR f IN favourite
+	          FILTER f._from == @userID
+			  FOR a IN asset
+			  FILTER f._to == a._id
+			  RETURN a`
+	cursor, err := fr.db.Query(context.Background(), query, bindVars)
+	if err != nil {
+		log.Printf("Failed to execute query")
+		return []domain.Asset{}, err
+	}
+	defer cursor.Close()
+
+	var assets []domain.Asset
+	for {
+		var asset domain.Asset
+		meta, err := cursor.ReadDocument(context.Background(), &asset)
+		if driver.IsNoMoreDocuments(err) {
+			break
+		} else if err != nil {
+			log.Printf("Failed to read document")
+			return []domain.Asset{}, err
+		}
+
+		asset = domain.Asset{
+			Key:         meta.Key,
+			Type:        asset.Type,
+			Description: asset.Description,
+			CreatedAt:   asset.CreatedAt,
+			Data:        asset.Data,
+		}
+		assets = append(assets, asset)
+	}
+	return assets, nil
+}

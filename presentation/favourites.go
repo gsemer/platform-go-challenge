@@ -41,3 +41,19 @@ func (fh FavouriteHandler) AddToFavourites(writer http.ResponseWriter, request *
 	result, _ := json.Marshal(favourite)
 	writer.Write(result)
 }
+
+func (fh FavouriteHandler) GetFavourites(writer http.ResponseWriter, request *http.Request) {
+	userID := request.Header.Get("user_id")
+
+	assets, err := fh.fs.GetFavourites(userID)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		result, _ := json.Marshal(err)
+		writer.Write(result)
+		return
+	}
+
+	writer.WriteHeader(http.StatusOK)
+	result, _ := json.Marshal(assets)
+	writer.Write(result)
+}

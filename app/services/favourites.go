@@ -1,6 +1,8 @@
 package services
 
-import "platform-go-challenge/domain"
+import (
+	"platform-go-challenge/domain"
+)
 
 type FavouriteService struct {
 	fr domain.FavouriteRepository
@@ -28,4 +30,17 @@ func (fs FavouriteService) AddToFavourites(userID, assetID string) (domain.Favou
 		return domain.Favourite{}, err
 	}
 	return favourite, nil
+}
+
+func (fs FavouriteService) GetFavourites(userID string) ([]domain.Asset, error) {
+	userArangoID, err := fs.ur.GetUser(userID)
+	if err != nil {
+		return []domain.Asset{}, err
+	}
+
+	assets, err := fs.fr.GetFavourites(userArangoID)
+	if err != nil {
+		return []domain.Asset{}, err
+	}
+	return assets, nil
 }
